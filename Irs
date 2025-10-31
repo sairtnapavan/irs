@@ -1,0 +1,329 @@
+1.	Representation of a Text Document in Vector Space Model and Computing Similarity between two documents. 
+Aim: To Implement Representation of a Text Document in Vector Space Model and Computing Similarity between two documents.
+Description: 
+Objective: To understand and implement how text documents can be represented numerically using the Vector Space Model (VSM). To compute the similarity between two documents using measures like Cosine Similarity.
+What is Vector Space Model (VSM)?
+VSM is an algebraic model that represents text documents as vectors in a multi-dimensional space. Each dimension corresponds to a unique term (word) in the corpus vocabulary. The value in each dimension may represent raw frequency, TF (Term Frequency), or TF-IDF (Term Frequency–Inverse Document Frequency) score.
+Why Vector Representation?
+Enables application of mathematical and statistical operations like distance or similarity. Useful in information retrieval, document clustering, classification, and recommendation systems.
+Cosine Similarity: Measures cosine of the angle between two vectors.
+Ranges from 0 (no similarity) to 1 (identical direction).
+Formula:
+ 
+Implementation:
+Preprocessing: Clean and tokenize documents.
+Vectorization: Convert documents into numerical vectors using TfidfVectorizer.
+Similarity Computation: Use cosine_similarity from sklearn.metrics.pairwise.
+
+Program:
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Sample documents
+doc1 = "Information retrieval is the process of obtaining relevant information from a collection of resources."
+doc2 = "Text mining and information retrieval are important components of data science."
+
+# Vectorize the documents using TF-IDF
+vectorizer = TfidfVectorizer()
+tfidf_matrix = vectorizer.fit_transform([doc1, doc2])
+
+# Compute cosine similarity
+similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])
+
+# Display similarity
+print("Cosine Similarity between doc1 and doc2:", similarity[0][0])
+
+Output:
+Cosine Similarity between doc1 and doc2: 0.23153213765661992
+
+
+
+
+
+
+
+
+
+
+
+
+
+Experiment-2
+2.	Pre-processing of a Text Document: stop word removal and stemming 
+Aim: To Implement Pre-processing of a Text Document: stop word removal and stemming.
+Description:
+Objective: To perform text preprocessing by implementing two fundamental steps:
+	Stop word removal
+	Stemming
+These steps reduce noise in text data and improve the performance of text mining and information retrieval tasks.
+What is Text Preprocessing?
+Text preprocessing refers to the transformation of raw text into a clean and analyzable format. It is the first and essential step in any natural language processing (NLP) or information retrieval task.
+Stop Word Removal: Stop words are commonly used words (like is, the, and, in, etc.) that carry little meaningful information for analysis.
+•	Removing them reduces dimensionality and computational complexity.
+•	Libraries like NLTK, spaCy, and Scikit-learn offer predefined stop word lists.
+Stemming: Stemming is the process of reducing inflected or derived words to their root or base form (e.g., playing, played, plays → play).
+•	Porter Stemmer and Lancaster Stemmer are commonly used.
+•	Unlike lemmatization, stemming is rule-based and faster but less accurate grammatically.
+Implementation:
+•	Input: Raw text document.
+•	Tokenization: Split text into individual words.
+•	Stopword Removal: Remove all stop words using a stop word list.
+•	Stemming: Apply a stemming algorithm to the remaining tokens.
+•	Output: List of cleaned, stemmed tokens.
+Program:
+# Install spaCy and download model
+!pip install -q spacy
+!python -m spacy download en_core_web_sm
+
+# Now import libraries
+import spacy
+from nltk.stem import PorterStemmer
+
+# Load spaCy English model
+nlp = spacy.load("en_core_web_sm")
+
+# Sample text
+text = "Text mining is the process of deriving meaningful information from natural language text."
+
+# Process the text
+doc = nlp(text)
+
+# Tokenize and remove stopwords using spaCy
+tokens = [token.text.lower() for token in doc if token.is_alpha and not token.is_stop]
+
+# Apply stemming using NLTK's PorterStemmer
+stemmer = PorterStemmer()
+stemmed_tokens = [stemmer.stem(token) for token in tokens]
+
+# Output results
+print("Original Text:\n", text)
+print("\nTokens after Stop Word Removal:\n", tokens)
+print("\nStemmed Tokens:\n", stemmed_tokens)
+
+Output:
+Original Text:
+
+ Text mining is the process of deriving meaningful information from natural language text.
+
+Tokens after Stop Word Removal:
+ ['text', 'mining', 'process', 'deriving', 'meaningful', 'information', 'natural', 'language', 'text']
+
+Stemmed Tokens:
+ ['text', 'mine', 'process', 'deriv', 'meaning', 'inform', 'natur', 'languag', 'text']
+Experiment-3
+3.	Write a Python Program To Implement Signature Files by taking 2 documents.
+Aim: To implement Signature files by taking 2 documents.
+Description: 
+Signature File in Information Retrieval
+What is a Signature File?
+A Signature File is a classic indexing technique used in Information Retrieval (IR) systems to quickly find documents that may contain a given search term. Instead of storing the entire text, each document is represented by a compact binary signature (bit string) that acts like a fingerprint.
+•	Each bit position in the signature corresponds to a word (or a group of words) in the vocabulary.
+•	If the word is present in the document → bit = 1
+•	If the word is absent → bit = 0
+Thus, searching becomes faster since the system only needs to check these binary vectors rather than scanning the whole document.
+How it Works (Steps)
+1.	Tokenization – Break documents into words.
+2.	Vocabulary Creation – Collect all unique words from the collection.
+3.	Signature Generation – For each document:
+o	Initialize a binary array of length = number of unique words.
+o	Set 1 in the positions where words occur, else keep 0.
+4.	Query Processing –
+o	Convert the query word into its index in the signature.
+o	Check all document signatures to see where the bit = 1.
+o	Retrieve those documents as relevant results.
+Program:
+# Step 1: Create two documents
+doc1 = "sachin virat dhoni anu"
+doc2 = "anu chinna purna ram"
+documents = [doc1, doc2]
+# Step 2: Extract all unique words from both documents
+unique_words = set()
+tokenized_docs = []
+for doc in documents:
+    words = doc.lower().split()
+    tokenized_docs.append(words)
+    unique_words.update(words)
+unique_words = sorted(unique_words)  # keep consistent order
+print("Unique Words:", unique_words)
+# Step 3: Generate signature for each unique word
+word_index = {word: i for i, word in enumerate(unique_words)}
+def create_signature(words):
+    signature = [0] * len(unique_words)
+    for word in words:
+        if word in word_index:
+            signature[word_index[word]] = 1
+    return signature
+# Create signature for each document
+doc_signatures = [create_signature(words) for words in tokenized_docs]
+# Show document signatures
+print("\nDocument Signatures:")
+for i, sig in enumerate(doc_signatures):
+    print(f"Document {i+1}: {sig}")
+# Step 4: Query and retrieve relevant documents
+query = input("\nEnter a word to search: ").lower()
+if query in word_index:
+    query_idx = word_index[query]
+    print(f"\nDocuments containing the word '{query}':")
+    found = False
+    for i, signature in enumerate(doc_signatures):
+        if signature[query_idx] == 1:
+            print(f"- Document {i+1}: \"{documents[i]}\"")
+            found = True
+    if not found:
+        print("No documents found.")
+else:
+    print(f"The word '{query}' is not in the indexed vocabulary.")
+Output:
+Unique Words: ['anu', 'chinna', 'dhoni', 'purna', 'ram', 'sachin', 'virat']
+Document Signatures:
+Document 1: [1, 0, 0, 1, 0, 1, 1]
+Document 2: [0, 1, 1, 0, 1, 1, 0]
+Enter a word to search: ashok
+Documents containing the word 'sachin':
+- Document 1: " sachin virat dhoni anu"
+Experiment-4
+4.	Classification of a set of Text Documents into known classes (You may use any of the Classification algorithms like Naive Bayes, Max Entropy, Rochio’s, Support Vector Machine). Standard Datasets will have to be used to show the results. 
+Aim: To Classification of a set of Text Documents into known classes (You may use any of the Classification algorithms like Naive Bayes, Max Entropy, Rochio’s, Support Vector Machine). Standard Datasets will have to be used to show the results. 
+Description:
+What is Text Classification?
+Text classification is a supervised learning task where the goal is to assign a label or category to a text document based on its content.
+Examples:
+•	Classifying emails as spam or not spam
+•	Categorizing news into sports, politics, technology, etc.
+Common Algorithms Used:
+Algorithm	Description
+Naive Bayes	Probabilistic classifier assuming word independence
+SVM	Finds the optimal hyperplane separating classes
+Implementation Steps:
+1.	Dataset: Use a standard text dataset like:
+o	20 Newsgroups (from sklearn.datasets)
+o	SMS Spam Collection, or other labeled corpora.
+2.	Preprocessing:
+o	Lowercasing
+o	Stop-word removal
+o	Vectorization using TF-IDF
+3.	Model Training:
+o	Split dataset into training and testing sets
+o	Train the chosen classifier on training data
+4.	Evaluation:
+o	Predict classes on test data
+o	Compute accuracy, precision, recall, and F1-score
+Program:
+# Install required packages (if needed)
+!pip install -q scikit-learn
+
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC
+from sklearn.metrics import classification_report, accuracy_score
+
+# Load 20 Newsgroups dataset
+categories = ['alt.atheism', 'comp.graphics', 'sci.med', 'soc.religion.christian']
+newsgroups = fetch_20newsgroups(subset='all', categories=categories, shuffle=True, random_state=42)
+
+#  Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    newsgroups.data, newsgroups.target, test_size=0.3, random_state=42
+)
+
+#  Vectorize text using TF-IDF
+vectorizer = TfidfVectorizer(stop_words='english', max_df=0.5)
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+
+# Train Naive Bayes Classifier
+nb_model = MultinomialNB()
+nb_model.fit(X_train_tfidf, y_train)
+nb_preds = nb_model.predict(X_test_tfidf)
+
+#  Train SVM Classifier
+svm_model = LinearSVC()
+svm_model.fit(X_train_tfidf, y_train)
+svm_preds = svm_model.predict(X_test_tfidf)
+
+#  Evaluate both models
+print("\n Naive Bayes Classifier Results:")
+print(classification_report(y_test, nb_preds, target_names=newsgroups.target_names))
+print("Accuracy:", accuracy_score(y_test, nb_preds))
+
+print("\n SVM Classifier Results:")
+print(classification_report(y_test, svm_preds, target_names=newsgroups.target_names))
+print("Accuracy:", accuracy_score(y_test, svm_preds))
+Output:
+	
+ 
+ 
+
+
+
+
+
+
+
+Experiment-5
+5.	Text Document Clustering using K-means. Demonstrate with a standard dataset and compute performance measures- Purity.
+Aim: To implement Text Document Clustering using K-means. Demonstrate with a standard dataset and compute performance measures- Purity, Precision, Recall and F-measure. 
+Description: 
+What is Document Clustering?
+•	Document clustering is an unsupervised learning technique used to group similar text documents together into clusters.
+•	Unlike classification, clustering does not require labeled data.
+What is K-Means Clustering?
+•	A centroid-based algorithm that partitions the dataset into K clusters.
+•	It minimizes the distance between data points and the centroid of the assigned cluster.
+•	In text mining, documents are first converted into TF-IDF vectors, and then clustered using Euclidean or cosine distance.
+Evaluation Metrics:
+Since clustering is unsupervised, evaluation requires comparing clusters with true class labels (if available).
+Metric	Description
+Purity	Measures the extent to which each cluster contains documents from a single class
+
+Implementation Steps:
+1.	Dataset: Use a labeled text dataset (like 20 Newsgroups with subset categories).
+2.	Preprocessing:
+o	Lowercase conversion
+o	Stopword removal
+o	TF-IDF vectorization
+3.	Clustering:
+o	Apply K-Means algorithm from sklearn.cluster
+o	Set k to the number of true categories
+4.	Evaluation:
+o	Match clusters to true labels
+o	Compute Purity.
+Program:	
+# Install scikit-learn (if not already)
+!pip install -q scikit-learn
+
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+import numpy as np
+
+# Load 4 categories from 20 Newsgroups dataset for simplicity
+categories = ['alt.atheism', 'comp.graphics', 'sci.med', 'soc.religion.christian']
+newsgroups = fetch_20newsgroups(subset='all', categories=categories, shuffle=True, random_state=42)
+
+# Vectorize using TF-IDF
+vectorizer = TfidfVectorizer(stop_words='english', max_df=0.5)
+X = vectorizer.fit_transform(newsgroups.data)
+y_true = newsgroups.target
+
+# Apply K-Means clustering
+k = len(categories)
+model = KMeans(n_clusters=k, init='k-means++', max_iter=100, n_init=10, random_state=42)
+model.fit(X)
+y_pred = model.labels_
+
+# --------- Purity Calculation ----------
+def purity_score(y_true, y_pred):
+    contingency = confusion_matrix(y_true, y_pred)
+    return np.sum(np.amax(contingency, axis=0)) / np.sum(contingency)
+
+# --------- Evaluation Metric ----------
+print("Purity Score:", purity_score(y_true, y_pred))
+
+Output:
+Purity Score: 0.5163607342378292
+
+ 
+
